@@ -14,4 +14,4 @@ relevant content and sumamrize findings for manual entry into another platform.
 
 #Exploratory-Data-Analysis-Project
 This code was written to complete the Coursera Data Science Specialization Course Project for the Exploratory Data Analysis Project.
-This project entailed taking raw data about electrical consumption and visualizing the data through plots. The challenge was to create plots exactly as shown in examples.
+This project entailed taking raw data about electrical consumption and visualizing the data through plots. The challenge was to create plots exactly as shown in examples. Plots can be viewed at this repo: https://github.com/JP92015/Exploratory-Data-Analysis-Project-1
