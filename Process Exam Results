@@ -1,0 +1,167 @@
+## This is a script I created to take student exam results from Blackboard, extract 
+##relevant content and sumamrize findings for manual entry into another platform.
+
+## load and clean Exam 1 data. Find student scores, and questions missed
+## exam 2 had 70 questions total, 65 main exam, and 5 sync
+## 231 had 70 main exam questions, 0 sync
+n <- 70 #for score percentage calculation
+
+library(tidyr)
+library(dplyr)
+
+exam2 <- read.csv("Exam_2.csv")
+exam2_231 <- read.csv("231.csv")
+exam2 <- cbind(exam2[,1:3], 
+               exam2[,4:length(exam2)][,grepl("Auto.Score", names(exam2[4:length(exam2)]))])
+## remove Tatiana Rock, since she is in 231
+exam2 <- exam2[!grepl("tdr30", exam2$Username),]
+
+exam2_231 <- cbind(exam2_231[,1:3], 
+               exam2_231[,4:length(exam2_231)][,grepl("Auto.Score", names(exam2_231[4:length(exam2_231)]))])
+sync_231 <- exam2_231[,c(1:3, 69:length(names(exam2_231)))]
+exam2_231 <- exam2_231[,1:68]
+
+exam2 <- rbind(exam2_231, exam2)
+
+#select student identifier and answer columns.
+
+section_info <- read.csv("roster.csv")
+section_info <- select(section_info, c(2, 7))
+section_info <- separate(section_info, Email, c("Username", "throwaway"), sep = -16)
+section_info <- separate(section_info, Section, c("throwaway2", "Section"), sep = -4)
+section_info <- section_info[2:nrow(section_info), c(-1,-4)] ##removes placeholder first row and throwaway column
+
+exam2 <- merge(section_info, exam2)
+exam2 <- select(exam2, c(2,1,3:length(exam2)))
+names(exam2)[5:length(names(exam2))] <- 1:65
+
+
+##add sync results
+sync_232 <- read.csv("232b.csv")
+sync_233 <- read.csv("233.csv")
+sync_234 <- read.csv("234.csv")
+sync_235 <- read.csv("235.csv")
+sync_236 <- read.csv("236.csv")
+sync_237 <- read.csv("237.csv")
+sync_238 <- read.csv("238.csv")
+
+##sync_234 <- cbind(sync_234[,1:3], 
+    ##sync_234[,4:length(sync_234)][,grepl("Auto.Score", names(sync_234[4:length(sync_234)]))])
+
+sync <- rbind(sync_232, sync_233, sync_234, sync_235, sync_236, sync_237, sync_238)
+sync <- cbind(sync[,1:3], 
+               sync[,4:length(sync)][,grepl("Auto.Score", names(sync[4:length(sync)]))])
+names(sync)[4:length(names(sync))] <- c(66:70)
+names(sync_231)[4:length(names(sync))] <- c(66:70)
+sync <- rbind(sync_231, sync)
+
+##remove "aey6" second sync response (she is in section 234)
+sync <- sync[-10,]
+
+exam2 <- merge(exam2, sync)
+
+
+
+#group by student and question and find student exam score
+exam2_tidy <- gather(exam2, "Question", "Correct", 5:(length(exam2)))
+exam2_tidy$Question <- as.integer(exam2_tidy$Question)
+exam2_tidy_grouped<- exam2_tidy %>% group_by(Section, Username, Last.Name, First.Name)
+exam2_clean <- spread(exam2_tidy, Question, Correct)
+
+exam2_score <- exam2_tidy_grouped %>% summarize("Total.Score" = sum(Correct))
+
+
+#list questions missed by each student
+logical_correct <- as.logical(unclass(data.frame(exam2_tidy_grouped)[,6]))
+exam2_tidy_missed <- filter(exam2_tidy_grouped[!logical_correct,])
+exam2_missed <- exam2_tidy_missed %>% summarize(
+  "Questions.Missed" = paste(Question, collapse=" "))
+
+
+##insert total score and missed questions into results dataframe
+exam2_results <- cbind(arrange(exam2_clean, Section, Username), 
+                       arrange(exam2_missed, Section, Username)[,5],
+                       arrange(exam2_score, Section, Username)[,5])
+exam2_results <- select(exam2_results, c(1:4, 
+                                         length(exam2_results), 
+                                         5:(length(exam2_results)-1)))
+names(exam2_results)[6:(length(exam2_results)-1)] <- 
+  paste("Q", names(exam2_results)[6:(length(exam2_results)-1)], sep = "_")
+
+
+#find percent of correct answers for each question by section and overall
+section_performance<- exam2_tidy %>% group_by(Section, Question) %>%
+  summarize("Performance" = mean(Correct)) %>%
+  arrange(Section, Question) %>%
+  spread(Question, Performance)
+
+overall_performance <- data.frame("Section" = "Overall", "Question" = 1:(length(exam2)-4),
+                                  "Performance" = apply(exam2[,5:length(exam2)], 2, mean), row.names = NULL)
+overall_performance <- spread(overall_performance, Question, Performance)
+overall_performance <- rbind(section_performance, overall_performance)
+names(overall_performance)[2:length(overall_performance)] <- 
+  paste("Q", names(overall_performance)[2:length(overall_performance)], sep = "_")
+
+
+#calculate stats per section and overall
+exam2_stats <- exam2_results %>% group_by(Section) %>%
+  summarize("Average" = mean(Total.Score),
+            "SD" = sd(Total.Score),
+            "Percentage" = mean(Total.Score)/n)
+exam2_stats <- rbind(exam2_stats, data.frame("Section" = "Overall", 
+                                             "Average" = mean(exam2_results$Total.Score),
+                                             "SD" = sd(exam2_results$Total.Score),
+                                             "Percentage" = mean(exam2_results$Total.Score)/length(exam2_results$Total.Score),
+                                             row.names = NULL))
+
+
+
+view <- function(overall, qsMissed, analysis, autofilter=TRUE) {
+  # data: data frame
+  # autofilter: whether to apply a filter to make sorting and filtering easier
+  overall <- data.frame(overall)
+  qsMissed <- data.frame(qsMissed)
+  analysis <- data.frame(analysis)
+  open_command <- switch(Sys.info()[['sysname']],
+                         Windows= 'open',
+                         Linux  = 'xdg-open',
+                         Darwin = 'open')
+  require(XLConnect)
+  temp_file <- paste0(tempfile(), '.xlsx')
+  wb <- loadWorkbook(temp_file, create = TRUE)
+  createSheet(wb, name = "Overall")
+  writeWorksheet(wb, overall, sheet = "Overall", startRow = 1, startCol = 1)
+  if (autofilter) setAutoFilter(wb, 'Overall', aref('A1', dim(overall)))
+  
+  createSheet(wb, name = "Performance")
+  writeWorksheet(wb, qsMissed, sheet = "Performance", startRow = 1, startCol = 1)
+  if (autofilter) setAutoFilter(wb, 'Performance', aref('A1', dim(qsMissed)))
+  
+  createSheet(wb, name = "Analysis")
+  writeWorksheet(wb, analysis, sheet = "Analysis", startRow = 1, startCol = 1)
+  if (autofilter) setAutoFilter(wb, 'Analysis', aref('A1', dim(analysis)))
+  
+  saveWorkbook(wb, )
+  system(paste(open_command, temp_file))
+}
+
+view(exam2_results, overall_performance, exam2_stats)
+
+
+# visualize performance by group
+library(ggplot2)
+ggplot(exam2_results, aes(Section, Total.Score)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.65) +
+  labs(title = "Exam 2 Score by Section") +
+  theme_minimal()
+
+
+# visulaize performance by question
+tidy_performance <- gather(overall_performance, "Question", "Performance", 2:length(overall_performance))
+tidy_performance$Question <- 1:70
+ggplot(tidy_performance, aes(Question, Performance)) + 
+  geom_point() +
+  labs(title = "Exam 2 Performance by Question") +
+  scale_x_continuous(breaks = seq(1,70,2)) +
+  theme_minimal()
