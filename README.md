@@ -13,6 +13,7 @@ Course Project.Rmd is the R markdown version of the project. It is available at:
 ###Process Exam Results
 This is an R script I created to take student exam results from Blackboard, extract 
 relevant content and summarize findings for manual entry into another platform.
+The code can be accessed here: https://github.com/JP92015/Sample-Work/blob/master/Process%20Exam%20Results
 
 
 ###Exploratory-Data-Analysis-Project
