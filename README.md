@@ -2,8 +2,8 @@
 
 
 
-###Practical Machine Learning Course Project
-The goal of the project was to train a machine learning algorithm to accurately predict the way in which a barbell lift was performed, using data from accelerometers on participants’ belt, forearm, arm and dumbell. I used a random forest algorithm to predict with high accuracy.
+###Machine Learning
+This project was completed for the Practical Machine Learning course in the Coursera Data Science Specialization. The goal of the project was to train a machine learning algorithm to accurately predict the way in which a barbell lift was performed, using data from accelerometers on participants’ belt, forearm, arm and dumbell. I used a random forest algorithm to predict with high accuracy.
 
 index.html is the html product of the project. It can be accessed at: https://jp92015.github.io/
 
@@ -12,7 +12,7 @@ Course Project.Rmd is the R markdown version of the project. It is available at:
 
 ###Process Exam Results
 This is an R script I created to take student exam results from Blackboard, extract 
-relevant content and sumamrize findings for manual entry into another platform.
+relevant content and summarize findings for manual entry into another platform.
 
 
 ###Exploratory-Data-Analysis-Project
