@@ -1,26 +1,23 @@
-##This repo containts a collection of projects I've completed.
+##Compilation of some data sciencey scripts I've written in R
+This is forked from my old github account, which I no longer update. I plan to update this repo with more projects when I have the time to tinker in data science.
 
 
+###Data Interpretation
+[This project](https://jp92015.github.io/) was completed for the **Practical Machine Learning** course in the [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science). There is also an [R markdown](https://github.com/JP92015/JP92015.github.io/blob/master/Course%20Project.Rmd) version.
 
-###Machine Learning
-This project was completed for the Practical Machine Learning course in the Coursera Data Science Specialization. The goal of the project was to train a machine learning algorithm to accurately predict the way in which a barbell lift was performed, using data from accelerometers on participants’ belt, forearm, arm and dumbell. I used a random forest algorithm to predict with high accuracy.
-
-index.html is the html product of the project. It can be accessed at: https://jp92015.github.io/
-
-Course Project.Rmd is the R markdown version of the project. It is available at:  https://github.com/JP92015/JP92015.github.io/blob/master/Course%20Project.Rmd
+The goal of the project was to train a machine learning algorithm to accurately predict the way in which a barbell lift was performed, using data from accelerometers on participants’ belt, forearm, arm and dumbell. I used a random forest algorithm to predict actions with high accuracy.
 
 
-###Process Exam Results
-This is an R script I created to take student exam results from Blackboard, extract 
-relevant content and summarize findings for manual entry into another platform.
-The code can be accessed here: https://github.com/JP92015/Sample-Work/blob/master/Process%20Exam%20Results
+###Data Processing
+[R script](https://github.com/JP92015/Sample-Work/blob/master/Process%20Exam%20Results) I created to take exam results from a Blackboard course, extract
+relevant content and summarize findings for faculty review.
 
 
-###Exploratory-Data-Analysis-Project
-This code was written to complete the Coursera Data Science Specialization Course Project for the Exploratory Data Analysis Project.
-This project entailed taking raw data about electrical consumption and visualizing the data through plots. The challenge was to create plots exactly as shown in examples. Plots can be viewed at this repo: https://github.com/JP92015/Exploratory-Data-Analysis-Project-1
+###Visualizing Electrical Consumption
+[Course project](https://github.com/JP92015/Exploratory-Data-Analysis-Project-1) for the **Exploratory Data Analysis** [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science).
+This project entailed taking raw data about electrical consumption and visualizing the data through creating specific plots.
 
 
 ###Run Analysis
-This was a project to complete the Getting and Cleaning Data course in the Coursera Data Science Specialization. 
-run_analysis contains a script to load test and training data from the UCI HAR Dataset, compute means by activity and subject from reported variable means, and returns this data in tidy format. More information can be found in the original repo: https://github.com/JP92015/Course-Project
+[This code](https://github.com/JP92015/Course-Project/blob/master/Run%20Analysis) and [repo](https://github.com/JP92015/Course-Project) were a project completing the **Getting and Cleaning Data** course in the [Coursera Data Science Specialization](https://www.coursera.org/specializations/jhu-data-science).
+The run_analysis script loads and tests training data from the [UCI HAR Dataset](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones), computes averages by activity and subject from it, and returns this data in [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf) format.
